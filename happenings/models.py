@@ -12,6 +12,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
+from mezzanine.core.fields import RichTextField
 
 from .managers import EventManager
 
@@ -54,7 +55,8 @@ class Event(models.Model):
     )
     end_repeat = models.DateField(_("end repeat"), null=True, blank=True)
     title = models.CharField(_("title"), max_length=255)
-    description = models.TextField(_("description"))
+    description = models.RichTextField(_("Main description"))
+    description_short = models.RichTextField(_("Short description"))
     location = models.ManyToManyField(
         'Location', verbose_name=_('locations'), blank=True
     )
@@ -65,6 +67,9 @@ class Event(models.Model):
     categories = models.ManyToManyField(
         'Category', verbose_name=_('categories'), blank=True
     )
+    
+    banner = FileField(verbose_name=_("Banner image"),upload_to=upload_to("articles.Magazine.pdf", "article"),format="Image", max_length=255, null=True, blank=True)
+    image = FileField(verbose_name=_("Event image"),upload_to=upload_to("articles.Magazine.pdf", "article"),format="Image", max_length=255, null=True, blank=True)
     tags = models.ManyToManyField('Tag', verbose_name=_('tags'), blank=True)
 
     # --------------------------------COLORS-------------------------------- #
