@@ -11,9 +11,8 @@ from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
-
 from mezzanine.core.fields import RichTextField, FileField
-from mezzanine.utils.models import upload_to
+from mezzanine.utils.models import upload_to, AdminThumbMixin
 
 from .managers import EventManager
 
@@ -22,7 +21,7 @@ auth_user_model = getattr(settings, "AUTH_USER_MODEL", "auth.User")
 
 
 @python_2_unicode_compatible
-class Event(models.Model):
+class Event(models.Model,AdminThumbMixin):
 
     USER_COLORS = getattr(settings, "CALENDAR_COLORS", '')
 
@@ -90,7 +89,7 @@ class Event(models.Model):
         _("font color custom"), max_length=6, blank=True,
         help_text=_('Must be a valid hex triplet. Default is black (000000)')
     )
-
+    admin_thumb_field = "image"
     def __init__(self, *args, **kwargs):
         super(Event, self).__init__(*args, **kwargs)
         self._last_popover_html = None
