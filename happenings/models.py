@@ -12,9 +12,11 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
-from mezzanine.core.fields import RichTextField
+from mezzanine.core.fields import RichTextField, FileField
+from mezzanine.utils.models import upload_to
 
 from .managers import EventManager
+
 
 auth_user_model = getattr(settings, "AUTH_USER_MODEL", "auth.User")
 
@@ -55,8 +57,8 @@ class Event(models.Model):
     )
     end_repeat = models.DateField(_("end repeat"), null=True, blank=True)
     title = models.CharField(_("title"), max_length=255)
-    description = models.RichTextField(_("Main description"))
-    description_short = models.RichTextField(_("Short description"))
+    description = RichTextField(_("Main description"),blank=True)
+    description_short = RichTextField(_("Short description"),blank=True)
     location = models.ManyToManyField(
         'Location', verbose_name=_('locations'), blank=True
     )
@@ -67,6 +69,7 @@ class Event(models.Model):
     categories = models.ManyToManyField(
         'Category', verbose_name=_('categories'), blank=True
     )
+    
     
     banner = FileField(verbose_name=_("Banner image"),upload_to=upload_to("articles.Magazine.pdf", "article"),format="Image", max_length=255, null=True, blank=True)
     image = FileField(verbose_name=_("Event image"),upload_to=upload_to("articles.Magazine.pdf", "article"),format="Image", max_length=255, null=True, blank=True)
