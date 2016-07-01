@@ -2,13 +2,14 @@
 from __future__ import unicode_literals
 
 # python lib:
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 # django:
 from django.views.generic import ListView, DetailView
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.utils.dates import MONTHS_ALT
+from django.core import serializers
 
 # thirdparties:
 import six
@@ -19,7 +20,8 @@ from happenings.utils.displays import month_display, day_display
 from happenings.utils.next_event import get_next_event
 from happenings.utils.mixins import JSONResponseMixin
 from happenings.utils import common as c
-
+import pytz
+import json
 
 CALENDAR_LOCALE = getattr(settings, 'CALENDAR_LOCALE', 'en_US.utf8')
 
@@ -81,6 +83,9 @@ class EventMonthView(GenericEventView):
 
     def get_month_events(self, *args, **kwargs):
         return Event.objects.all_month_events(*args, **kwargs)
+    
+    def get_all_events(self, *args, **kwargs):
+        return Event.objects.all_events(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(EventMonthView, self).get_context_data(**kwargs)
@@ -109,7 +114,9 @@ class EventMonthView(GenericEventView):
         context['month_and_year'] = u"%(month)s, %(year)d" % (
             {'month': display_month, 'year': year}
         )
-
+        
+        context['next_month']=datetime(year,month+1,1,0,0,0,0,pytz.UTC)
+        context['now']=datetime(year,month,1,0,0,0,0,pytz.UTC).isoformat()
         if error:  # send any year/month errors
             context['cal_error'] = error
 
@@ -121,6 +128,10 @@ class EventMonthView(GenericEventView):
         all_month_events = list(self.get_month_events(
             year, month, self.category, self.tag, loc=True, cncl=True
         ))
+        
+        all_events = list(self.get_all_events(
+            self.category, self.tag, loc=True, cncl=True
+        ))
 
         all_month_events.sort(key=lambda x: x.l_start_date.hour)
 
@@ -129,7 +140,32 @@ class EventMonthView(GenericEventView):
             year, month, all_month_events, start_day, self.net, qs, mini,
             request=self.request,
         )
-
+        _all_events=[]
+        for item in all_events:
+            color='#fd3a13'
+            loc=item.location.first()
+            if loc:
+                loc=loc.name
+            else:
+                loc="No location set"
+            cancel=item.cancellations.first()
+            if cancel:
+                cancel=cancel.reason
+                color='grey'
+            if item.is_past():
+                color='grey'
+            _prep={}
+            _prep['title']=item.title
+            _prep['start']=item.start_date.isoformat()
+            _prep['url']=item.get_absolute_url()
+            _prep['loc']=loc
+            _prep['cancel']=cancel
+            _prep['desc']=item.html_stripped
+            _prep['color']=color
+            #_prep['className']='js-popups'
+            _all_events.append(_prep)
+        context['json_events']=json.dumps(_all_events)
+        
         context['show_events'] = False
         if getattr(settings, "CALENDAR_SHOW_LIST", False):
             context['show_events'] = True

@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
+from django.utils.html import strip_tags
 from mezzanine.core.fields import RichTextField, FileField
 from mezzanine.utils.models import upload_to, AdminThumbMixin
 
@@ -112,6 +113,18 @@ class Event(models.Model,AdminThumbMixin):
     @cached_property
     def l_end_date(self):
         return self.get_l_end_date()
+
+    def is_past(self):
+        end = self.l_end_date
+        now=timezone.now()
+        if now>end:
+            return True
+        else:
+            return False
+    
+    @property
+    def html_stripped(self):
+        return strip_tags(self.description_short)
 
     def is_happening(self, now):
         """Return True if the event is happening 'now', False if not."""

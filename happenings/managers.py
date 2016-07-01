@@ -66,6 +66,28 @@ class EventManager(models.Manager):
             Q(end_repeat=None) | Q(end_repeat__gte=ym_first),
             start_date__lte=ym_last  # no events that haven't started yet
         ).filter(**kwargs).prefetch_related(*pref).order_by('start_date').distinct()
+        
+    def all_events(self, category=None, tag=None,
+                         loc=False, cncl=False):
+        """
+        Returns all events that have an occurrence 
+        """
+        kwargs = self._get_kwargs(category, tag)
+        
+
+        pref = []
+        if loc:
+            pref.append("location")
+        if cncl:
+            pref.append("cancellations")
+
+        # for yearly repeat, we need to check the start and end date months
+        # b/c yearly events should occur every year in the same month
+        
+        
+        
+
+        return self.model.objects.filter(**kwargs).prefetch_related(*pref).order_by('start_date').distinct()
 
 #    XXX These are no longer used since all_month_events() (above) was created.
 #    def month_events(self, year, month, category=None, tag=None):

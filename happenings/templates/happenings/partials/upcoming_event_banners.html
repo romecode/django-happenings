@@ -1,0 +1,20 @@
+{% load weekday %}
+
+    {% for list in upcoming_events %}
+        <div class="col-half">
+            <ul class="calendar-list">
+            {% for d, event in list %}
+            
+            
+            <li class="month-event" style="background:{{ colors.0 }}; color:{{ colors.1 }};">
+                <figure class="event_banners"><a href="{{ event.get_absolute_url }}"><img src="/static/media/{{event.banner}}"></a></figure>
+            </li>
+            
+            {% endfor %}  
+            </ul> 
+        </div>
+        
+    {% empty %}
+    Oops.. No events!
+    {% endfor %}
+

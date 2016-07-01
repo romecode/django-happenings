@@ -44,3 +44,4 @@ class EventAdmin(admin.ModelAdmin):
 
 admin.site.register(Event, EventAdmin)
 admin.site.register(Cancellation)
+admin.site.register(Location)

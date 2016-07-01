@@ -15,6 +15,7 @@ from happenings.utils.common import (
     clean_year_month,
     get_now
 )
+from datetime import date
 
 register = Library()
 start_day = getattr(settings, "CALENDAR_START_DAY", 0)
@@ -62,6 +63,45 @@ def upcoming_events(now=None, finish=90, num=5):
         (item for sublist in all_upcoming for item in sublist),
         key=lambda x: x[0]
     )
+    return {'upcoming_events': upcoming}
+
+@register.inclusion_tag('happenings/partials/upcoming_event_banners.html')
+def upcoming_event_banners(now=None, finish=365, num=8):
+    if now is None:
+        now = get_now()
+    finish = now + timezone.timedelta(days=finish)
+    finish = finish.replace(hour=23, minute=59, second=59, microsecond=999)
+    all_upcoming = (UpcomingEvents(x, now, finish, num).get_upcoming_events()
+                    for x in Event.objects.live(now))
+    upcoming = heapq.nsmallest(
+        num,
+        (item for sublist in all_upcoming for item in sublist),
+        key=lambda x: x[0]
+    )
+    _upcoming=[]
+    _upcoming.append(upcoming[:4])
+    _upcoming.append(upcoming[4:8])
+    
+    return {'upcoming_events': _upcoming}
+
+@register.inclusion_tag('happenings/partials/upcoming_event_banners_plain.html')
+def upcoming_event_banners_plain(now=None, finish=365, num=20):
+    
+    if now is None:
+        now = get_now()
+    
+    finish = now + timezone.timedelta(days=finish)
+    finish = finish.replace(hour=23, minute=59, second=59, microsecond=999)
+    all_upcoming = (UpcomingEvents(x, now, finish, num).get_upcoming_events()
+                    for x in Event.objects.live(now))
+    upcoming = heapq.nsmallest(
+        num,
+        (item for sublist in all_upcoming for item in sublist),
+        key=lambda x: x[0]
+    )
+    
+    
+    
     return {'upcoming_events': upcoming}
 
 
