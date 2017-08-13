@@ -57,6 +57,7 @@ class Event(models.Model,AdminThumbMixin):
     )
     end_repeat = models.DateField(_("end repeat"), null=True, blank=True)
     title = models.CharField(_("title"), max_length=255)
+    external_url = models.CharField(_("external url"), max_length=255,blank=True)
     description = RichTextField(_("Main description"),blank=True)
     description_short = RichTextField(_("Short description"),blank=True)
     location = models.ManyToManyField(

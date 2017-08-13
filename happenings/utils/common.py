@@ -70,7 +70,7 @@ def get_qs(old_qs):
 
 
 # TODO change from d to something more descriptive
-def order_events(events, d=False):
+def order_events(events, d=False, ignore_occ=False):
     """
     Group events that occur on the same day, then sort them alphabetically
     by title, then sort by day. Returns a list of tuples that looks like
@@ -78,19 +78,23 @@ def order_events(events, d=False):
     is an alphabetically sorted list of the events for the day.
     """
     ordered_events = {}
+   
     for event in events:
         try:
             for occ in event.occurrence:
                 try:
                     ordered_events[occ].append(event)
+                    
                 except Exception:
                     ordered_events[occ] = [event]
+                if ignore_occ:
+                        break
         except AttributeError:  # no occurrence for this event
             # This shouldn't happen, since an event w/o an occurrence
             # shouldn't get this far, but if it does, just skip it since
             # it shouldn't be displayed on the calendar anyway.
             pass
-
+    print ordered_events
     if d:
         # return as a dict without sorting by date
         return ordered_events

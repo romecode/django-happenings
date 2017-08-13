@@ -12,7 +12,7 @@ class CancellationInline(admin.TabularInline):
 class EventAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
-            'fields': ('start_date', 'end_date', 'all_day', 'title', 'description_short','description','banner','image',
+            'fields': ('start_date', 'end_date', 'all_day', 'title','external_url', 'description_short','description','banner','image',
                        'created_by',)
         }),
         ('Location', {
