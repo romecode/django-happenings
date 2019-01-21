@@ -4,7 +4,7 @@ from django.conf.urls import url
 from . import views
 
 
-urlpatterns = ['',
+urlpatterns = [
     url(r'^$', views.EventMonthView.as_view(), name='list'),
     url(r'^month/shift/$', views.EventMonthView.as_view(), name='month_shift'),
     url(r'^event-list/shift/$', views.EventMonthView.as_view(), name='event_list_shift'),
