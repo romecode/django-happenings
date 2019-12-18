@@ -114,8 +114,13 @@ class EventMonthView(GenericEventView):
         context['month_and_year'] = u"%(month)s, %(year)d" % (
             {'month': display_month, 'year': year}
         )
-        
-        context['next_month']=datetime(year,month+1,1,0,0,0,0,pytz.UTC)
+        if month == 12:
+            n_mth = 1
+            n_yr = year + 1
+        else:
+            n_mth = month
+            n_yr = year
+        context['next_month']=datetime(n_yr,n_mth+1,1,0,0,0,0,pytz.UTC)
         context['now']=datetime(year,month,1,0,0,0,0,pytz.UTC).isoformat()
         if error:  # send any year/month errors
             context['cal_error'] = error
